@@ -35,21 +35,32 @@ export default function ProductCard({
     const finalImageUrl = imageUrl || '/images/no-image.jpg';
 
     return (
-        <div className={className}>
+        <div className={`
+      flex flex-col bg-white max-w-sm w-full p-2
+      ${className}
+    `}>
             <Link href={`/products/${id}`}>
                 <Image
                     src={finalImageUrl}
                     alt={title}
                     width={imageSize}
                     height={imageSize}
+                    className="w-full object-contain aspect-square"
                 />
             </Link>
-            <h3>{title}</h3>
-            {rating !== undefined && reviewCount !== undefined && (
-                <p>☆☆☆☆☆（-件）</p>
-            )}
-            <p>¥{price.toLocaleString()}</p>
-            {showCartButton && <button>カートへ</button>}
+            <div className="flex flex-col">
+                <h3 className="text-sm font-semibold leading-tight mb-1">{title}</h3>
+                {rating !== undefined && reviewCount !== undefined && (
+                    <p>☆☆☆☆☆（-件）</p>
+                )}
+                <div className="flex justify-between items-center w-full mt-2">
+                    <p className="text-lg font-bold">¥{price.toLocaleString()}</p>
+                    {showCartButton && <button className="
+                border border-indigo-500 hover:bg-indigo-400
+                text-indigo-500 hover:text-white
+                py-2 px-4 rounded-sm">カートへ</button>}
+                </div>
+            </div>
         </div>
     )
 }
