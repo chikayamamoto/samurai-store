@@ -21,33 +21,53 @@ export async function GET(request: NextRequest) {
         const offset = (page - 1) * perPage;
         // クエリパラメータから並べ替え条件を取得
         const sort = searchParams.get('sort') ?? 'new';
-            // ORDER BY句に指定する条件を決定
-    let order = '';
-    switch (sort) {
-      case 'priceAsc': // 価格が安い順
-        order = 'ORDER BY price ASC';
-        break;
-      case 'new': // 新着順
-      default:
-        order = 'ORDER BY created_at DESC';
-        break;
-    }
+        // ORDER BY句に指定する条件を決定
+        let order = '';
+        switch (sort) {
+            case 'priceAsc': // 価格が安い順
+                order = 'ORDER BY price ASC';
+                break;
+            case 'new': // 新着順
+            default:
+                order = 'ORDER BY created_at DESC';
+                break;
+        }
+        // クエリパラメータから検索キーワードを取得
+        const keyword = searchParams.get('keyword')?.trim() || '';
+        console.log("DEBUG KEYWORD:", keyword);
+
+        // WHERE句のベースを構築
+        const where = keyword
+            ? 'WHERE (name LIKE ? OR description LIKE ?)'
+            : ''; // WHERE句を付加せず全データを取得
+
+        // WHERE句に指定するパラメータを構築
+        const whereParams = keyword
+            ? [`%${keyword}%`, `%${keyword}%`]
+            : [];
+
+        // SQL文に埋め込むパラメータを構築
+        const productsParams = [...whereParams, perPage, offset];
+        const countParams = [...whereParams];
+
         // 2つのデータベース操作を並行処理で実施
         const [products, totalItemsResult] = await Promise.all([
             // LIMITとOFFSETを使い、現在のページに表示する商品データだけを取得
             executeQuery<Product[]>(`
         SELECT *
         FROM products
+        ${where}
         ${order}
         LIMIT ?
         OFFSET ?
-        ;`, [perPage, offset]
+        ;`, productsParams
             ),
             // 商品データの全件数を取得
             executeQuery<{ count: number }>(`
         SELECT COUNT(*) AS count
         FROM products
-      ;`)
+        ${where}
+      ;`, countParams)
         ]);
 
         // 全件数を扱いやすい変数に取得

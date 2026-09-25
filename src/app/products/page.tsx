@@ -34,11 +34,14 @@ export default async function ProductsPage({
     const page = Number(sp?.page ?? '1');
     const perPage = Number(sp?.perPage ?? '16');
     const sort = typeof sp?.sort === 'string' ? sp.sort : 'new';
+    const keyword = typeof sp?.keyword === 'string' ? sp.keyword : '';
+
     // クエリパラメータを1つの文字列にまとめる
     const query = new URLSearchParams({
         page: String(page),
         perPage: String(perPage),
-        sort
+        sort,
+        keyword
     });
     // 商品APIから商品データを取得
     const res = await fetch(`${process.env.BASE_URL}/api/products?${query.toString()}`, {
@@ -64,8 +67,17 @@ export default async function ProductsPage({
         <main className="p-8">
             <h1>商品一覧</h1>
             <section className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                <p>{productsPageData.pagination.totalItems}件の商品が見つかりました（ {productsPageData.pagination.totalPages} ページ中 {productsPageData.pagination.currentPage} ページ目を表示）</p>
-                        <Sort sort={sort} perPage={perPage} />
+                <p className="text-lg mt-4">
+                    {keyword && (
+                        <>
+                            「<span className="text-blue-600 font-semibold">{keyword}</span>」の検索結果：
+                        </>
+                    )}
+                    {productsPageData.pagination.totalItems}件の商品が見つかりました（&nbsp;
+                    {productsPageData.pagination.totalPages}&nbsp;ページ中&nbsp;
+                    {productsPageData.pagination.currentPage}&nbsp;ページ目を表示）
+                </p>
+                <Sort sort={sort} perPage={perPage} />
             </section>
 
             <section className="mb-8">
