@@ -4,6 +4,9 @@ import ProductList from '@/components/ProductList';
 import { type ProductCardProps } from '@/components/ProductCard';
 import { type ProductData } from '@/types/product';
 import Pagination from '@/components/Pagination';
+import Sort from '@/app/products/Sort';
+
+
 // 商品データの型定義
 type Product = Pick<ProductData, 'id' | 'name' | 'price' | 'image_url' | 'review_avg' | 'review_count'>;
 // 商品一覧ページに必要なデータ群
@@ -30,9 +33,15 @@ export default async function ProductsPage({
     // URLのクエリパラメータから必要なデータを取得
     const page = Number(sp?.page ?? '1');
     const perPage = Number(sp?.perPage ?? '16');
-
+    const sort = typeof sp?.sort === 'string' ? sp.sort : 'new';
+    // クエリパラメータを1つの文字列にまとめる
+    const query = new URLSearchParams({
+        page: String(page),
+        perPage: String(perPage),
+        sort
+    });
     // 商品APIから商品データを取得
-    const res = await fetch(`${process.env.BASE_URL}/api/products?page=${page}&perPage=${perPage}`, {
+    const res = await fetch(`${process.env.BASE_URL}/api/products?${query.toString()}`, {
         cache: 'no-store'
     });
 
@@ -56,6 +65,7 @@ export default async function ProductsPage({
             <h1>商品一覧</h1>
             <section className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
                 <p>{productsPageData.pagination.totalItems}件の商品が見つかりました（ {productsPageData.pagination.totalPages} ページ中 {productsPageData.pagination.currentPage} ページ目を表示）</p>
+                        <Sort sort={sort} perPage={perPage} />
             </section>
 
             <section className="mb-8">
