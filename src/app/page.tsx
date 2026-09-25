@@ -3,14 +3,14 @@
 import Link from 'next/link';
 import Image from 'next/image'
 import { useState, useEffect } from 'react';
-import ProductCard from './components/ProductCard';
+import ProductCard from '../components/ProductCard';
 
 // 商品データの型定義
 type Product = {
   id: number
   name: string
   price: number
-  imageUrl?: string
+  image_url?: string
 };
 
 export default function Home() {
@@ -67,7 +67,7 @@ export default function Home() {
                   id={item.id.toString()}
                   title={item.name}
                   price={item.price}
-                  imageUrl={item.imageUrl}
+                  imageUrl={item.image_url}
                   imageSize={400}
                 />
               ))}
@@ -89,7 +89,7 @@ export default function Home() {
                   id={item.id.toString()}
                   title={item.name}
                   price={item.price}
-                  imageUrl={item.imageUrl}
+                  imageUrl={item.image_url}
                   showCartButton
                 />
               ))}
@@ -111,7 +111,7 @@ export default function Home() {
                   id={item.id.toString()}
                   title={item.name}
                   price={item.price}
-                  imageUrl={item.imageUrl}
+                  imageUrl={item.image_url}
                   showCartButton
                 />
               ))}

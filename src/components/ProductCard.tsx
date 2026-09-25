@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 // 商品カードコンポーネントに渡すデータ（props）の型定義
-interface ProductCardProps {
+export interface ProductCardProps {
     id: string; // 商品ID
     title: string; // 商品タイトル
     price: number; // 商品価格
@@ -31,8 +31,10 @@ export default function ProductCard({
     showCartButton = false,
     className = ''
 }: ProductCardProps) {
-    // 画像の指定がなければダミー画像を表示
-    const finalImageUrl = imageUrl || '/images/no-image.jpg';
+    // 画像の指定がなければダミー画像を表示g
+    const finalImageUrl = imageUrl
+        ? `/uploads/${imageUrl}`
+        : '/images/no-image.jpg';
 
     return (
         <div className={`
@@ -42,7 +44,7 @@ export default function ProductCard({
             <Link href={`/products/${id}`}>
                 <Image
                     src={finalImageUrl}
-                    alt={title}
+                    alt={title || '商品画像'}
                     width={imageSize}
                     height={imageSize}
                     className="w-full object-contain aspect-square"
