@@ -1,18 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { executeQuery } from '@/lib/db'; // DB共通モジュール
+import { type ProductData } from '@/types/product';
 // 商品データの型定義
-type Product = {
-    id: number;
-    name: string;
-    description?: string | null;
-    price: number;
-    stock: number;
-    image_url?: string | null;
-    review_avg?: number; // 平均評価（一般ユーザー向け）
-    review_count?: number; // 総レビュー数（一般ユーザー向け）
-    updated_at?: string; // 最終更新日時（管理者向け）
-};
-
+type Product = ProductData; // 基本型から変更なし
 // 指定IDの商品データを取得
 export async function GET(
     request: NextRequest,
