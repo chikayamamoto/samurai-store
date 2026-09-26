@@ -49,6 +49,11 @@ export default function Header() {
                     <Link href="/account">
                         <Image src="/icons/account-icon.svg" alt="Account" width={24} height={24} className="w-6 h-6" />
                     </Link>
+                    <form method="POST" action="/api/auth/logout">
+                        <button type="submit" className="text-indigo-600 hover:underline">
+                            ログアウト
+                        </button>
+                    </form>
                 </div>
             </div>
         </header>

@@ -29,15 +29,19 @@ export default function Home() {
       .catch(err => console.error('商品データの取得に失敗しました。', err)); // エラー時の処理
   }, []);
   const searchParams = useSearchParams();
-  const isRegistered = searchParams.get('registered');
+  const message =
+    searchParams.get('registered') ? '会員登録が完了しました。' :
+    searchParams.get('logged-in') ? 'ログインしました。' :
+    searchParams.get('logged-out') ? 'ログアウトしました。' :
+    null;
   return (
     <div className="min-h-screen font-[family-name:var(--font-geist-sans)]">
-      {isRegistered && (
+      {message && (
         <div className="bg-green-100 text-green-800 p-3 text-center shadow-md">
-          会員登録が完了しました。
+          {message}
         </div>
       )}
-      
+
       <section className="relative w-full aspect-[3/2] overflow-hidden">
         <Image
           src="/images/main-visual.jpg"
