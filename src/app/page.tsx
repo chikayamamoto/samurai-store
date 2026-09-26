@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image'
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import ProductCard from '../components/ProductCard';
 import { type ProductData } from '@/types/product';
 
@@ -20,17 +21,23 @@ export default function Home() {
     // 商品APIからデータを取得
     fetch('/api/products/home')
       .then(res => res.json()) // JSON形式に変換
-        .then(data => { // 状態を更新
+      .then(data => { // 状態を更新
         setPickUp(data.pickUp);
         setNewArrival(data.newArrival);
         setHotItems(data.hotItems);
       })
       .catch(err => console.error('商品データの取得に失敗しました。', err)); // エラー時の処理
   }, []);
-
+  const searchParams = useSearchParams();
+  const isRegistered = searchParams.get('registered');
   return (
     <div className="min-h-screen font-[family-name:var(--font-geist-sans)]">
-
+      {isRegistered && (
+        <div className="bg-green-100 text-green-800 p-3 text-center shadow-md">
+          会員登録が完了しました。
+        </div>
+      )}
+      
       <section className="relative w-full aspect-[3/2] overflow-hidden">
         <Image
           src="/images/main-visual.jpg"
@@ -61,7 +68,7 @@ export default function Home() {
             <span className="text-base">おすすめ商品</span>
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-             {pickUp
+            {pickUp
               .slice(0, 3)
               .map(item => (
                 <ProductCard
