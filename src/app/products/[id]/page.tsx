@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'; // 404ページ表示用
 import Link from 'next/link';
 import Image from 'next/image';
 import { type ProductData } from '@/types/product';
-
+import { isLoggedIn } from '@/lib/auth';
 // 商品データの型定義
 type Product = ProductData; // 基本型から変更なし
 
@@ -71,7 +71,8 @@ export default async function ProductDetailPage(props: ProductDetailPageProps) {
   const finalImageUrl = product.image_url
     ? `/uploads/${product.image_url}`
     : '/images/no-image.jpg';
-
+  // ログイン状態を取得
+  const loggedIn = await isLoggedIn();
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row gap-8">
@@ -105,16 +106,16 @@ export default async function ProductDetailPage(props: ProductDetailPageProps) {
                 <button className="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded-sm">
                   カートに追加
                 </button>
-                <> {/* ログイン済みユーザー専用 */}
+                {loggedIn && (
                   <button className="border border-indigo-500 text-indigo-500 py-2 px-4 rounded-sm hover:bg-indigo-50">
                     購入手続きへ
                   </button>
-                </>
+                 )}
               </div>
             )}
-            <> {/* ログイン済みユーザー専用 */}
+            {loggedIn && (
               <button className="text-teal-800 hover:underline">&#9825; お気に入り追加</button>
-            </>
+            )}
           </div>
 
           <div className="mt-8 pt-4 border-t border-gray-200">

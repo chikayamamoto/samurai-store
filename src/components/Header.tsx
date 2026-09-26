@@ -1,14 +1,45 @@
 'use client';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { type AuthUser } from '@/lib/auth';
+
+// ヘッダーコンポーネントに渡すデータ（props）の型定義
+export interface HeaderProps {
+    user: AuthUser | null;
+};
+
 // 共通ヘッダー
-export default function Header() {
+export default function Header({ user }: HeaderProps) {
+    const [isMenuOpen, setIsMenuOpen] = useState(false); // メニュー開閉状態
+    const menuRef = useRef<HTMLDivElement>(null); // メニューのDOM参照用
+    // メニューを閉じる関数
+    const closeMenu = () => setIsMenuOpen(false);
+    // メニューの開閉状態を反転させる関数
+    const toggleMenu = () => setIsMenuOpen(prev => !prev);
+
     const searchParams = useSearchParams();
     const perPage = searchParams.get('perPage') || '16';
     const sort = searchParams.get('sort') || 'new';
     const keyword = searchParams.get('keyword') || '';
+    // メニュー外のクリックを検知し、メニューを閉じる
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            // メニュー外がクリックされたら非表示
+            if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+                closeMenu();
+            }
+        };
+        // メニュー外のクリックを検知するイベントリスナー
+        document.addEventListener('click', handleClickOutside);
 
+        // クリーンアップ処理（イベントリスナーを削除）
+        return () => document.removeEventListener('click', handleClickOutside);
+    }, []);
+
+    // メニュー項目の共通スタイル
+    const menuItemStyle = 'block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100';
     return (
         <header className="bg-white shadow-md">
 
@@ -46,14 +77,39 @@ export default function Header() {
                     <Link href="/cart">
                         <Image src="/icons/cart-icon.svg" alt="Cart" width={24} height={24} className="w-6 h-6" />
                     </Link>
-                    <Link href="/account">
-                        <Image src="/icons/account-icon.svg" alt="Account" width={24} height={24} className="w-6 h-6" />
-                    </Link>
-                    <form method="POST" action="/api/auth/logout">
-                        <button type="submit" className="text-indigo-600 hover:underline">
-                            ログアウト
+                    <div className="relative" ref={menuRef}>
+                        <button onClick={toggleMenu} className="cursor-pointer" >
+                            <Image src="/icons/account-icon.svg" alt="Account" width={24} height={24} className="w-6 h-6" />
+                            {user && (
+                                <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full ring-2 ring-white" />
+                            )}
                         </button>
-                    </form>
+                        {isMenuOpen && (
+                            <div className="absolute right-0 w-48 bg-white rounded-md shadow-lg py-1 z-10 border border-gray-300">
+                                {user ? (
+                                    <>
+                                        <Link href="/account" onClick={closeMenu} className={menuItemStyle}>
+                                            マイページ
+                                        </Link>
+                                        <form method="POST" action="/api/auth/logout">
+                                            <button type="submit" className={`${menuItemStyle} w-full text-left`}>
+                                                ログアウト
+                                            </button>
+                                        </form>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Link href="/login" onClick={closeMenu} className={menuItemStyle}>
+                                            ログイン
+                                        </Link>
+                                        <Link href="/register" onClick={closeMenu} className={menuItemStyle}>
+                                            会員登録
+                                        </Link>
+                                    </>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </header>
