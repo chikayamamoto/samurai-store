@@ -4,25 +4,27 @@ import Link from 'next/link';
 import Image from 'next/image'
 import { useState, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
+import { type ProductData } from '@/types/product';
 
 // 商品データの型定義
-type Product = {
-  id: number
-  name: string
-  price: number
-  image_url?: string
-};
+type Product = Pick<ProductData, 'id' | 'name' | 'price' | 'image_url' | 'review_avg' | 'review_count'>;
 
 export default function Home() {
   // 商品データを保持するための状態
-  const [products, setProducts] = useState<Product[]>([]);
+  const [pickUp, setPickUp] = useState<Product[]>([]);
+  const [newArrival, setNewArrival] = useState<Product[]>([]);
+  const [hotItems, setHotItems] = useState<Product[]>([]);;
 
   // コンポーネントの表示直後に一度だけ実行される処理
   useEffect(() => {
     // 商品APIからデータを取得
-    fetch('/api/products')
+    fetch('/api/products/home')
       .then(res => res.json()) // JSON形式に変換
-      .then(data => setProducts(data)) // 状態を更新
+        .then(data => { // 状態を更新
+        setPickUp(data.pickUp);
+        setNewArrival(data.newArrival);
+        setHotItems(data.hotItems);
+      })
       .catch(err => console.error('商品データの取得に失敗しました。', err)); // エラー時の処理
   }, []);
 
@@ -59,7 +61,7 @@ export default function Home() {
             <span className="text-base">おすすめ商品</span>
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
-            {products
+             {pickUp
               .slice(0, 3)
               .map(item => (
                 <ProductCard
@@ -67,7 +69,7 @@ export default function Home() {
                   id={item.id.toString()}
                   title={item.name}
                   price={item.price}
-                  imageUrl={item.image_url}
+                  imageUrl={item.image_url ?? undefined}
                   imageSize={400}
                 />
               ))}
@@ -81,7 +83,7 @@ export default function Home() {
             <span className="text-base">新着商品</span>
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
-            {products
+            {newArrival
               .slice(0, 4)
               .map(item => (
                 <ProductCard
@@ -89,7 +91,7 @@ export default function Home() {
                   id={item.id.toString()}
                   title={item.name}
                   price={item.price}
-                  imageUrl={item.image_url}
+                  imageUrl={item.image_url ?? undefined}
                   showCartButton
                 />
               ))}
@@ -103,7 +105,7 @@ export default function Home() {
             <span className="text-base">注目商品</span>
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4">
-            {products
+            {hotItems
               .slice(0, 4)
               .map(item => (
                 <ProductCard
@@ -111,7 +113,7 @@ export default function Home() {
                   id={item.id.toString()}
                   title={item.name}
                   price={item.price}
-                  imageUrl={item.image_url}
+                  imageUrl={item.image_url ?? undefined}
                   showCartButton
                 />
               ))}
